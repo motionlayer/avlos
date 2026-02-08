@@ -74,6 +74,16 @@ The output config defines the output modules that will be used and their options
 
 There are three main generated files that are configured above: A header containing enums (`output_enums`), a header containing function declarations (`output_header`), and an implementation containing function definitions (`output_impl`).
 
+Optional: Endpoint metadata (for type-aware UART/ASCII parsing)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you want the C generator to emit an endpoint type metadata table (so firmware can parse and format ASCII without a hand-maintained table), add both of these optional paths under ``paths``:
+
+- ``output_metadata_header``: Path for the generated metadata header (e.g. ``fw/avlos_endpoint_metadata.h``).
+- ``output_metadata_impl``: Path for the generated metadata implementation (e.g. ``fw/avlos_endpoint_metadata.c``).
+
+When both are present, Avlos generates ``Avlos_EndpointMeta avlos_endpoint_meta[]`` and ``avlos_endpoint_meta_count`` in the same order as ``avlos_endpoints[]``. Each entry describes the endpoint kind (read-only, read-write, call with/without args), value type, and for callables the argument types. If either path is omitted, no metadata files are generated (backward compatible).
+
 Of note is that no #include statements for the generated files are generated automatically. This is something that we decided in order to maximize compatibility to edge cases, but may be revised in future Avlos versions.
 
 CLI Usage

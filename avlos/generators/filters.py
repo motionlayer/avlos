@@ -2,6 +2,25 @@ import os
 from copy import copy
 from typing import List
 
+from avlos.datatypes import DataType
+
+# Avlos_Dtype enum names for metadata (reduced set for UART/ASCII parsing)
+_AVLOS_DTYPE_MAP = {
+    DataType.VOID: "AVLOS_DTYPE_VOID",
+    DataType.BOOL: "AVLOS_DTYPE_BOOL",
+    DataType.UINT8: "AVLOS_DTYPE_UINT8",
+    DataType.INT8: "AVLOS_DTYPE_UINT8",
+    DataType.UINT16: "AVLOS_DTYPE_UINT32",
+    DataType.INT16: "AVLOS_DTYPE_INT32",
+    DataType.UINT32: "AVLOS_DTYPE_UINT32",
+    DataType.INT32: "AVLOS_DTYPE_INT32",
+    DataType.UINT64: "AVLOS_DTYPE_UINT32",
+    DataType.INT64: "AVLOS_DTYPE_INT32",
+    DataType.FLOAT: "AVLOS_DTYPE_FLOAT",
+    DataType.DOUBLE: "AVLOS_DTYPE_FLOAT",
+    DataType.STR: "AVLOS_DTYPE_STRING",
+}
+
 
 def avlos_endpoints(input) -> List:
     """
@@ -101,3 +120,50 @@ def capitalize_first(input: str) -> str:
         String with first character capitalized
     """
     return input[0].upper() + input[1:]
+
+
+def avlos_ep_kind(ep) -> str:
+    """
+    Return the Avlos_EndpointKind enum name for an endpoint (for metadata generation).
+
+    Args:
+        ep: Endpoint object (RemoteAttribute, RemoteFunction, RemoteEnum, or RemoteBitmask)
+
+    Returns:
+        String like AVLOS_EP_KIND_READ_ONLY, AVLOS_EP_KIND_CALL_WITH_ARGS, etc.
+    """
+    has_getter = getattr(ep, "getter_name", None) is not None
+    has_setter = getattr(ep, "setter_name", None) is not None
+    has_caller = getattr(ep, "caller_name", None) is not None
+    if has_caller:
+        num_args = len(getattr(ep, "arguments", None) or [])
+        if num_args == 0:
+            return "AVLOS_EP_KIND_CALL_NO_ARGS"
+        return "AVLOS_EP_KIND_CALL_WITH_ARGS"
+    if has_getter and has_setter:
+        return "AVLOS_EP_KIND_READ_WRITE"
+    if has_getter:
+        return "AVLOS_EP_KIND_READ_ONLY"
+    if has_setter:
+        return "AVLOS_EP_KIND_WRITE_ONLY"
+    return "AVLOS_EP_KIND_READ_ONLY"  # fallback
+
+
+def avlos_metadata_dtype(value) -> str:
+    """
+    Map a DataType or an object with .dtype (endpoint or argument) to Avlos_Dtype enum name.
+
+    Used for value_dtype and arg_dtypes in endpoint metadata. Narrowing (e.g. 64-bit to
+    32-bit) is applied where the metadata enum set is smaller than DataType.
+
+    Args:
+        value: Either a DataType enum member or an object with a .dtype attribute (endpoint, argument)
+
+    Returns:
+        String like AVLOS_DTYPE_UINT32, AVLOS_DTYPE_FLOAT, etc.
+    """
+    dtype = getattr(value, "dtype", value)
+    try:
+        return _AVLOS_DTYPE_MAP[dtype]
+    except KeyError:
+        return "AVLOS_DTYPE_UINT32"  # safe fallback

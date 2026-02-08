@@ -3,8 +3,11 @@ Pre-generation validation for Avlos code generation.
 Validates C identifiers, detects conflicts, and ensures consistency.
 """
 
+import logging
 import re
 from typing import List
+
+_logger = logging.getLogger("avlos")
 
 # C reserved words (C11 standard)
 C_RESERVED_WORDS = {
@@ -86,9 +89,11 @@ def validate_c_identifier(name: str, context: str = "") -> None:
     if len(name) > 63:
         # C99 requires at least 63 significant characters for identifiers
         ctx = f" ({context})" if context else ""
-        print(
-            f"Warning: Identifier '{name}'{ctx} is very long ({len(name)} chars). "
-            f"Some compilers may truncate after 63 characters."
+        _logger.warning(
+            "Identifier '%s'%s is very long (%d chars). " "Some compilers may truncate after 63 characters.",
+            name,
+            ctx,
+            len(name),
         )
 
 

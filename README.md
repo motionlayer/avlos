@@ -98,6 +98,7 @@ The output config defines the output modules that will be used and their options
             paths:
                 output_header: outputs/header.h
                 output_impl: outputs/header.c
+                # optional: output_metadata_header + output_metadata_impl for type-aware UART/ASCII
             header_includes:
             - src/header.h
             impl_includes:

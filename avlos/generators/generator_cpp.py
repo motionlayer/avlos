@@ -12,6 +12,21 @@ env = Environment(loader=PackageLoader("avlos"), autoescape=select_autoescape())
 
 
 def process(instance, config):
+    # Validate config has required paths
+    required_paths = ["output_helpers", "output_header", "output_impl"]
+    if "paths" not in config:
+        raise ValidationError(
+            "Config validation failed: Missing 'paths' section in avlos config.\n"
+            "Please add a 'paths' section with: output_helpers, output_header, output_impl"
+        )
+
+    missing_paths = [p for p in required_paths if p not in config["paths"]]
+    if missing_paths:
+        raise ValidationError(
+            f"Config validation failed: Missing required paths in avlos config: {', '.join(missing_paths)}\n"
+            f"Please add these paths to the 'paths' section of your avlos config file."
+        )
+
     # Validate before generation
     validation_errors = validate_all(instance)
     if validation_errors:
