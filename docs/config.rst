@@ -75,7 +75,7 @@ The output config defines the output modules that will be used and their options
 There are three main generated files that are configured above: A header containing enums (`output_enums`), a header containing function declarations (`output_header`), and an implementation containing function definitions (`output_impl`).
 
 Optional: Endpoint metadata (for type-aware UART/ASCII parsing)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you want the C generator to emit an endpoint type metadata table (so firmware can parse and format ASCII without a hand-maintained table), add both of these optional paths under ``paths``:
 

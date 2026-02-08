@@ -82,8 +82,11 @@ class TestValidation(unittest.TestCase):
         """Test that very long identifiers generate warnings."""
         # 64+ character identifier (C99 requires at least 63 significant chars)
         long_name = "a" * 70
-        # Should not raise, but might print warning
-        validate_c_identifier(long_name)
+        # Should not raise; warning is logged (captured here so it does not print)
+        with self.assertLogs("avlos", level="WARNING") as cm:
+            validate_c_identifier(long_name)
+        self.assertIn("very long", cm.output[0])
+        self.assertIn("63 characters", cm.output[0])
 
     def test_valid_device_passes_all_validation(self):
         """Test that good_device.yaml passes all validations."""

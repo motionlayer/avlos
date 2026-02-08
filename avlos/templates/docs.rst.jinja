@@ -1,6 +1,3 @@
-
-.. _api-reference:
-
 API REFERENCE
 =============
 
