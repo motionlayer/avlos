@@ -4,6 +4,9 @@ generators:
         paths:
             output_header: fw/protocol.h
             output_impl: fw/protocol.c
+            # Optional: emit endpoint type metadata for type-aware UART/ASCII (uncomment to enable)
+            # output_metadata_header: fw/avlos_endpoint_metadata.h
+            # output_metadata_impl: fw/avlos_endpoint_metadata.c
         header_includes:
         - header.h
         impl_includes:

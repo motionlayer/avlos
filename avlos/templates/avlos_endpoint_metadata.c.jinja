@@ -1,0 +1,34 @@
+/*
+* This file was automatically generated using Avlos.
+* https://github.com/tinymovr/avlos
+*
+* Any changes to this file will be overwritten when
+* content is regenerated.
+*/
+
+#include "{{ metadata_header_basename }}"
+
+{% set eps = instance | endpoints %}
+const Avlos_EndpointMeta avlos_endpoint_meta[] = {
+{% for ep in eps %}
+    /* {{ ep.endpoint_function_name }} */
+    [{{ ep.ep_id }}] = {
+        .kind = {{ ep | avlos_ep_kind }},
+        .value_dtype = {{ ep | avlos_metadata_dtype }},
+        .num_args = {% if ep | avlos_ep_kind == "AVLOS_EP_KIND_CALL_WITH_ARGS" %}{{ ep.arguments | length }}{% else %}0{% endif %},
+        .arg_dtypes = {
+            {%- for i in range(4) %}
+            {%- if ep | avlos_ep_kind == "AVLOS_EP_KIND_CALL_WITH_ARGS" and i < (ep.arguments | length) %}
+            {{ ep.arguments[i] | avlos_metadata_dtype }}
+            {%- else %}
+            AVLOS_DTYPE_VOID
+            {%- endif %}
+            {%- if i < 3 %}, {% endif %}
+            {%- endfor %}
+        }
+    }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+};
+
+const uint8_t avlos_endpoint_meta_count = sizeof(avlos_endpoint_meta) / sizeof(avlos_endpoint_meta[0]);
