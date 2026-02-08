@@ -55,15 +55,10 @@ class TestMetadataGeneration(unittest.TestCase):
         expected_count = len(avlos_endpoints(self.device))
         with open(self.meta_impl) as f:
             content = f.read()
-        # Generated line: const uint8_t avlos_endpoint_meta_count = sizeof(...)/sizeof(...);
+        # Count variable and sizeof expression (clang-format may wrap the line)
         self.assertIn("avlos_endpoint_meta_count", content)
-        # Count is derived from array size; array has one entry per endpoint, so count must appear
         self.assertIn("sizeof(avlos_endpoint_meta)", content)
-        # Sanity: file should mention the count variable definition with the expected value
-        self.assertIn(
-            "avlos_endpoint_meta_count = sizeof(avlos_endpoint_meta) / sizeof(avlos_endpoint_meta[0])",
-            content,
-        )
+        self.assertIn("sizeof(avlos_endpoint_meta) / sizeof(avlos_endpoint_meta[0])", content)
 
     def test_metadata_read_only_uint32(self):
         """A read-only uint32 endpoint (e.g. sn) has READ_ONLY kind and UINT32 value_dtype."""
